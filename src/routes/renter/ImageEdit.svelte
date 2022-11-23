@@ -1,47 +1,33 @@
 <script type="ts">
-    import InfoBox from "$components/InfoBox.svelte";
+    import ActionButton from "$components/ActionButton.svelte";
+    import type ActionButtonRes from "$types/ActionButtonRes";
     import { isValidHttpUrl } from "$utils/utils";
-    import Button, { Label } from "@smui/button";
     import Textfield from "@smui/textfield";
 
     export let images: string[];
     export let itemId: number;
 
-    let showInfoBox: (
-        text: string,
-        variant: "success" | "warn" | "error",
-        ms: number
-    ) => void;
-
-    let imageDeleteButtonState: "neutral" | "active" = "neutral";
-    async function onImageDelete(url: string) {
-        imageDeleteButtonState = "active";
-
+    async function onImageDelete(url: string): ActionButtonRes {
         const res = await fetch("/api/db/images", {
             method: "DELETE",
             body: JSON.stringify({ url }),
         });
+        if (!res.ok) return { state: "error", text: res.statusText };
 
-        imageDeleteButtonState = "neutral";
-        if (!res.ok) {
-            showInfoBox(res.statusText, "error", 2000);
-            return;
-        }
-
-        showInfoBox("Nuotrauka sėkmingai ištrinta!", "success", 2000);
-        images = images.filter((image) => image != url);
+        setTimeout(
+            () => (images = images.filter((image) => image != url)),
+            2000
+        );
+        return { state: "success", text: "Nuotrauka sėkmingai ištrinta!" };
     }
 
     let newImageUrl = "";
     let urlInvalid: boolean;
-    let imageAddButtonState: "neutral" | "active" = "neutral";
-    async function addNewImage() {
+    async function addNewImage(): ActionButtonRes {
         if (newImageUrl.length === 0 || urlInvalid) {
-            showInfoBox("Įvestas neteisingo formato URL!", "warn", 3000);
-            return;
+            return { state: "warn", text: "Įvestas neteisingo formato URL!" };
         }
 
-        imageAddButtonState = "active";
         const res = await fetch("/api/db/images", {
             method: "POST",
             body: JSON.stringify({
@@ -49,18 +35,13 @@
                 itemId,
             }),
         });
-        imageAddButtonState = "neutral";
+        if (!res.ok)
+            return { state: "error", text: (await res.json()).message };
 
-        if (!res.ok) {
-            const err = await res.json();
-
-            showInfoBox(err.message, "error", 3000);
-            return;
-        }
-
-        showInfoBox("Nuotrauka sėkmingai pridėta!", "success", 2000);
         images = [...images, newImageUrl];
         newImageUrl = "";
+
+        return { state: "success", text: "Nuotrauka sėkmingai pridėta!" };
     }
 </script>
 
@@ -70,14 +51,7 @@
         <div class="flex gap-8 border rounded p-4 items-center">
             <img class="w-40" src={image} alt="product" />
             <p class="grow">{image}</p>
-            <Button
-                disabled={imageDeleteButtonState === "active"}
-                on:click={() => onImageDelete(image)}
-                variant="unelevated"
-                color="secondary"
-            >
-                <Label>-</Label>
-            </Button>
+            <ActionButton onClick={() => onImageDelete(image)}>Naikinti</ActionButton>
         </div>
     {/each}
     <div class="space-y-4">
@@ -92,16 +66,10 @@
                 variant="outlined"
             />
         </div>
-
-        <Button
+        <ActionButton
             class="w-full"
-            disabled={imageAddButtonState === "active" ||
-                newImageUrl.length === 0 || !isValidHttpUrl(newImageUrl)}
-            on:click={addNewImage}
-            variant="unelevated"
+            disabled={newImageUrl.length === 0 || !isValidHttpUrl(newImageUrl)}
+            onClick={addNewImage}>Pridėti</ActionButton
         >
-            <Label>Pridėti</Label>
-        </Button>
     </div>
-    <InfoBox bind:showInfoBox />
 </div>

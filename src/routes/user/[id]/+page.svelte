@@ -2,13 +2,15 @@
     import MoneyIcon from "$components/svg-icons/MoneyIcon.svelte";
     import PencilSquareIcon from "$components/svg-icons/PencilSquareIcon.svelte";
     import UserIcon from "$components/svg-icons/UserIcon.svelte";
-    import type { Item, ReviewDB } from "$types/DBStructures";
+    import type { Item } from "$types/DBStructures";
     import Button, { Label } from "@smui/button";
     import Accordion, { Panel, Header, Content } from "@smui-extra/accordion";
     import IconButton, { Icon } from "@smui/icon-button";
     import { page } from "$app/stores";
     import { useQuery } from "@sveltestack/svelte-query";
     import queryClient from "$lib/query";
+    import ActionButton from "$components/ActionButton.svelte";
+    import type ActionButtonRes from "$types/ActionButtonRes";
 
     export let data: Item;
 
@@ -22,12 +24,7 @@
     let reviewPanelOpen = false;
     let review: string = "";
 
-    let buttonState: "neutral" | "active" | "error" = "neutral";
-    let error = "";
-
-    async function sendReview() {
-        buttonState = "active";
-
+    async function submitReview(): ActionButtonRes {
         const res = await fetch("/api/db/reviews", {
             method: "POST",
             body: JSON.stringify({
@@ -38,14 +35,13 @@
         });
 
         if (!res.ok) {
-            buttonState = "error";
-            error = (await res.json()).message
-            return;
+            return { state: "error", text: (await res.json()).message };
         }
 
-        buttonState = "neutral";
         review = "";
-        queryClient.invalidateQueries('reviewData')
+        queryClient.invalidateQueries("reviewData");
+
+        return { state: "success", text: "Atsiliepimas išsiųstas" };
     }
 </script>
 
@@ -78,7 +74,7 @@
             </div>
             <div class="space-y-2">
                 <div class="flex items-center">
-                    <UserIcon className="inline-block w-6 h-6 mr-2" />
+                    <UserIcon class="inline-block w-6 h-6 mr-2" />
                     <h2 class="inline-block">Nuomininkas</h2>
                 </div>
 
@@ -102,11 +98,11 @@
         </div>
     </div>
     <div class="flex flex-col gap-4">
-        <p class="text-xl">Atsiliepimai</p>
+        <p class="text-xl">Atsiliepimai apie {data.renter}</p>
         <Accordion class="w-full">
             <Panel bind:open={reviewPanelOpen}>
                 <Header>
-                    Palikti atsiliepimą apie nuomininką
+                    Palikti atsiliepimą:
                     <IconButton slot="icon" toggle pressed={reviewPanelOpen}>
                         <Icon class="material-icons" on>expand_less</Icon>
                         <Icon class="material-icons">expand_more</Icon>
@@ -114,7 +110,7 @@
                 </Header>
                 <Content class="space-y-2">
                     <div class="flex items-center">
-                        <UserIcon className="inline-block w-6 h-6 mr-2" />
+                        <UserIcon class="inline-block w-6 h-6 mr-2" />
                         <span>{data.renter}</span>
                     </div>
                     <textarea
@@ -122,24 +118,11 @@
                         bind:value={review}
                         placeholder="Rašyti čia..."
                     />
-                    <Button
+                    <ActionButton
                         class="w-full"
-                        variant="raised"
-                        on:click={sendReview}
-                        disabled={buttonState === "active" ||
-                            buttonState === "error" ||
-                            review.length < 4}
+                        disabled={review.length < 4}
+                        onClick={submitReview}>Siųsti</ActionButton
                     >
-                        <Label underline>
-                            {#if buttonState === "neutral"}
-                                Siųsti
-                            {:else if buttonState === "active"}
-                                Siunčiama...
-                            {:else if buttonState === "error"}
-                                {error}
-                            {/if}
-                        </Label>
-                    </Button>
                 </Content>
             </Panel>
         </Accordion>
@@ -149,12 +132,12 @@
             <span>Klaida: {$dataStatus.error}</span>
         {:else}
             {#each $dataStatus.data.reviews as review (review.id)}
-                <div class="flex flex-col border rounded p-4">
-                    <div class="flex items-center">
-                        <UserIcon className="inline-block w-6 h-6 mr-2" />
-                        <span>{review.fk_reviewer}</span>
+                <div class="flex items-center border rounded p-4 gap-4">
+                    <UserIcon class="w-8 h-8" />
+                    <div>
+                        <span class="font-bold">{review.fk_reviewer}</span>
+                        <p>{review.review}</p>
                     </div>
-                    <p>{review.review}</p>
                 </div>
             {/each}
         {/if}

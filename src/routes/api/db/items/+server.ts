@@ -60,10 +60,10 @@ export const GET: RequestHandler = async () => {
 }
 
 export const PUT: RequestHandler = async ({ request }) => {
-    const { item_id, newName, newDescription, newPrice } = await request.json();
+    const { item_id, name, description, price } = await request.json();
 
     //* Update item.
-    const [_, queryError] = await trycatchasync(async () => await promisePool.execute(`UPDATE items SET name = ?, description = ?, price = ? WHERE items.id = ?`, [newName, newDescription, newPrice, item_id]));
+    const [_, queryError] = await trycatchasync(async () => await promisePool.execute(`UPDATE items SET name = ?, description = ?, price = ? WHERE items.id = ?`, [name, description, price, item_id]));
     if (queryError) {
         throw error(500, queryError);
     }

@@ -27,6 +27,7 @@
 		"@sveltejs/kit": "next",
 		"@types/cookie": "^0.5.1",
 		"@types/jsonwebtoken": "^8.5.9",
+		"@types/qs": "^6.9.7",
 		"@types/underscore": "^1.11.4",
 		"autoprefixer": "^10.4.8",
 		"postcss": "^8.4.16",
@@ -46,6 +47,7 @@
 		"dotenv": "^16.0.2",
 		"jsonwebtoken": "^8.5.1",
 		"mysql2": "^2.3.3",
+		"qs": "^6.11.0",
 		"underscore": "^1.13.6"
 	}
 }

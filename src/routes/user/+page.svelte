@@ -66,7 +66,7 @@
                     <div class="flex justify-between">
                         <p>{item.price} eur / mėn.</p>
                         <span>
-                            <UserIcon className="inline-block w-6 h-6" />
+                            <UserIcon class="inline-block w-6 h-6" />
                             <span>{item.renter}</span>
                         </span>
                     </div>

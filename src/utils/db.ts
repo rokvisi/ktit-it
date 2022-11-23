@@ -1,10 +1,8 @@
 import promisePool from '$lib/db';
 import { trycatchasync } from '$utils/trycatch';
 import { error } from '@sveltejs/kit';
-import type { ServerLoad } from "@sveltejs/kit";
-import type { ImageDB, Item, ItemDB, ItemGroupDB } from '$types/DBStructures';
+import type { ImageDB, Item, ItemDB, ItemGroupDB, RentRequest } from '$types/DBStructures';
 import _ from "underscore";
-import { stringify } from 'postcss';
 
 export function toFixedPrecision(num: number, precision: number): number {
     return Number.parseFloat(num.toFixed(precision))
@@ -55,4 +53,26 @@ export async function getDBItemsForUser(user: string): Promise<Item[]> {
         };
     })
 }
+
+export async function getDBRentRequestsForUser(user: string): Promise<RentRequest[]> {
+    type RequestQueryResult = { status: string; fk_rentee: string; name: string; time: Date; url: string }
+
+    //* Get the requests.
+    const [requestsQueryResult, requestsQueryError] = await trycatchasync(async () => await promisePool.execute(`SELECT r.status, r.fk_rentee, i.name, r.time, img.url FROM rent_requests AS r LEFT JOIN items AS i ON r.fk_item = i.id LEFT JOIN images as img ON i.id = img.fk_item WHERE r.fk_renter = ?`, [user]));
+    if (requestsQueryError) {
+        throw error(500, requestsQueryError);
+    }
+    const [requests] = requestsQueryResult as unknown as [RequestQueryResult[]];
+
+    return requests.map((request) => {
+        return {
+            status: request.status,
+            rentee: request.fk_rentee,
+            itemName: request.name,
+            time: request.time,
+            image_url: request.url,
+        };
+    })
+}
+
 

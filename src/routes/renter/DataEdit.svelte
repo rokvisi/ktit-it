@@ -1,68 +1,40 @@
 <script type="ts">
-    import InfoBox from "$components/InfoBox.svelte";
+    import ActionButton from "$components/ActionButton.svelte";
+    import type ActionButtonRes from "$types/ActionButtonRes";
     import type { Item } from "$types/DBStructures";
-    import Button, { Label } from "@smui/button";
     import Textfield from "@smui/textfield";
 
     export let item: Item;
 
-    let showInfoBox: (
-        text: string,
-        variant: "success" | "warn" | "error",
-        ms: number
-    ) => void;
+    const fields = {
+        name: item.name,
+        description: item.description,
+        price: item.price,
+    };
 
-    let newName = item.name;
-    let newDescription = item.description;
-    let newPrice = item.price;
+    //* The save button is disabled if no fields changed.
+    $: disabled =
+        item.name === fields.name &&
+        item.price === fields.price &&
+        item.description === fields.description;
 
-    //* Text data state button disable state.
-    let disabled = true;
-    $: {
-        //* Check if title, price or description edited.
-        if (
-            item.name === newName &&
-            item.price === newPrice &&
-            item.description === newDescription
-        ) {
-            disabled = true;
-        } else {
-            disabled = false;
-        }
-    }
-
-    async function onSave() {
-        disabled = true;
-
+    async function onSave(): ActionButtonRes {
         const res = await fetch("/api/db/items", {
             method: "PUT",
             body: JSON.stringify({
                 item_id: item.id,
-                newName: newName,
-                newDescription: newDescription,
-                newPrice: newPrice,
+                ...fields,
             }),
         });
-
-        disabled = false;
-
-        if (!res.ok) {
-            showInfoBox(res.statusText, "error", 3000);
-            return;
-        }
+        if (!res.ok) return { state: "error", text: res.statusText };
 
         //* Update the "old" data.
-        item.name = newName;
-        item.description = newDescription;
-        item.price = newPrice;
+        item.name = fields.name;
+        item.description = fields.description;
+        item.price = fields.price;
 
-        //* Show success text.
-        showInfoBox("Išsaugota sėkmingai!", "success", 2000);
-
-        disabled = false;
+        return { state: "success", text: "Išsaugota sėkmingai!" };
     }
-
-    
 </script>
 
 <div class="grid grid-cols-2 gap-8">
@@ -72,7 +44,7 @@
             class="w-full"
             variant="outlined"
             type="text"
-            bind:value={newName}
+            bind:value={fields.name}
         />
     </div>
     <div>
@@ -81,7 +53,7 @@
             class="w-full"
             variant="outlined"
             type="number"
-            bind:value={newPrice}
+            bind:value={fields.price}
         />
     </div>
 
@@ -91,17 +63,10 @@
             class="w-full"
             helperLine$style="width: 100%;"
             textarea
-            bind:value={newDescription}
+            bind:value={fields.description}
         />
     </div>
-
-    <Button
-        class="col-span-full"
-        {disabled}
-        on:click={onSave}
-        variant="unelevated"
+    <ActionButton class="col-span-full" {disabled} onClick={onSave}
+        >Išsaugoti Pakeitimus</ActionButton
     >
-        <Label>Išsaugoti Pakeitimus</Label>
-    </Button>
-    <InfoBox divClass="col-span-full" bind:showInfoBox />
 </div>

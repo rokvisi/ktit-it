@@ -32,6 +32,15 @@
                     {/if}
                 </Label>
             </Button>
+
+            {#if userRole === "renter"}
+                <Button variant="unelevated" href={`/renter/requests`}>
+                    <Label>
+                        Užsakymai
+                    </Label>
+                </Button>
+            {/if}
+
             {/if}
 
             {#if userRole && userRole === "user"}
