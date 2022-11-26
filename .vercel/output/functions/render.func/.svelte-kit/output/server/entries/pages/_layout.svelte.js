@@ -80,7 +80,7 @@ const Header = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       default: () => {
         return `${validate_component(Label, "Label").$$render($$result, {}, {}, {
           default: () => {
-            return `Gra\u017Einti`;
+            return `Gr\u0105\u017Einti`;
           }
         })}`;
       }

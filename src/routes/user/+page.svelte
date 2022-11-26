@@ -73,7 +73,7 @@
         placeholder="Ieškoti..."
         bind:value={textSearch}
     />
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 mb-10">
         {#each filteredItems as item (item.id)}
             <div
                 class="flex p-4 border rounded gap-4 hover:bg-gray-200 cursor-pointer"

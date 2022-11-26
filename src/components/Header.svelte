@@ -44,7 +44,7 @@
 
                 {#if userRole === "user"}
                     <Button variant="unelevated" href={`/user/returns`}>
-                        <Label>Gražinti</Label>
+                        <Label>Grąžinti</Label>
                     </Button>
                 {/if}
             {/if}

@@ -41,7 +41,7 @@ const Page = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   $$unsubscribe_dataStatus();
   $$unsubscribe_page();
   return `${$dataStatus.isLoading ? `<span>Kraunama...</span>` : `${$dataStatus.error ? `<span>Klaida: ${escape($dataStatus.error)}</span>` : `<input class="${"w-full mb-4 border rounded p-4"}" type="${"text"}" placeholder="${"Ie\u0161koti..."}"${add_attribute("value", textSearch, 0)}>
-    <div class="${"flex flex-col gap-4"}">${each(filteredItems, (item) => {
+    <div class="${"flex flex-col gap-4 mb-10"}">${each(filteredItems, (item) => {
     return `<div class="${"flex p-4 border rounded gap-4 hover:bg-gray-200 cursor-pointer"}"><img class="${"aspect-auto w-40"}"${add_attribute("src", item.images[0], 0)} alt="${"product"}">
                 <div class="${"flex flex-col grow"}"><div class="${"mb-auto"}"><span class="${"text-lg mr-2"}">${escape(item.name)}</span>
                         <span class="${"inline-flex gap-2"}">${each(item.groups, (group) => {
