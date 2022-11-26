@@ -5,12 +5,9 @@ import { error, type RequestHandler } from "@sveltejs/kit";
 export const DELETE: RequestHandler = async ({ request }) => {
     const { itemId, addedGroups, removedGroups } = await request.json();
 
-    console.log(itemId, addedGroups, removedGroups);
-
     for (const addedGroup of addedGroups) {
         const [_, groupAddQueryError] = await trycatchasync(async () => await promisePool.execute(`INSERT INTO item_groups VALUES (?, ?)`, [itemId, addedGroup]));
         if (groupAddQueryError) {
-            console.log(groupAddQueryError.message)
             throw error(500, groupAddQueryError.message);
         }
     }
@@ -18,7 +15,6 @@ export const DELETE: RequestHandler = async ({ request }) => {
     for (const removedGroup of removedGroups) {
         const [_, groupRemoveQueryError] = await trycatchasync(async () => await promisePool.execute(`DELETE FROM item_groups WHERE item_groups.fk_item = ? AND item_groups.fk_group = ?`, [itemId, removedGroup]));
         if (groupRemoveQueryError) {
-            console.log(groupRemoveQueryError.message)
             throw error(500, groupRemoveQueryError.message);
         }
     }

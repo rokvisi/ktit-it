@@ -45,51 +45,123 @@
     }
 </script>
 
-<div
-    class="inline-flex flex-col items-center gap-4 w-72 border p-4 rounded shadow"
->
-    <p class="mr-auto">Įveskite prisijungimo duomenis</p>
-    <Textfield
-        class="w-full"
-        bind:value={userInfo.username}
-        type="text"
-        label="Username"
-        required
-    />
-    <Textfield
-        class="w-full"
-        bind:value={userInfo.password}
-        type="password"
-        label="Password"
-        required
-    />
+<div class="flex flex-col items-center justify-center gap-8">
+    <div
+        class="inline-flex flex-col items-center gap-4 w-72 border p-4 rounded shadow"
+    >
+        <p class="mr-auto">Įveskite prisijungimo duomenis</p>
+        <Textfield
+            class="w-full"
+            bind:value={userInfo.username}
+            type="text"
+            label="Username"
+            required
+        />
+        <Textfield
+            class="w-full"
+            bind:value={userInfo.password}
+            type="password"
+            label="Password"
+            required
+        />
 
-    {#if error}
-        <Card padded variant="outlined" class="text-red-600 w-full">
-            {error}
-        </Card>
-    {/if}
-
-    <div class="flex w-full gap-4">
-        {#if loading}
-            <CircularProgress class="h-10 w-10 mx-auto" indeterminate />
-        {:else}
-            <Button
-                class="w-full"
-                disabled={buttonsDisabled}
-                variant="outlined"
-                on:click={() => authHandler("login")}
-            >
-                <Label underline>Prisijungti</Label>
-            </Button>
-            <Button
-                class="w-full"
-                disabled={buttonsDisabled}
-                variant="outlined"
-                on:click={() => authHandler("register")}
-            >
-                <Label>Registruotis</Label>
-            </Button>
+        {#if error}
+            <Card padded variant="outlined" class="text-red-600 w-full">
+                {error}
+            </Card>
         {/if}
+
+        <div class="flex w-full gap-4">
+            {#if loading}
+                <CircularProgress class="h-10 w-10 mx-auto" indeterminate />
+            {:else}
+                <Button
+                    class="w-full"
+                    disabled={buttonsDisabled}
+                    variant="outlined"
+                    on:click={() => authHandler("login")}
+                >
+                    <Label underline>Prisijungti</Label>
+                </Button>
+                <Button
+                    class="w-full"
+                    disabled={buttonsDisabled}
+                    variant="outlined"
+                    on:click={() => authHandler("register")}
+                >
+                    <Label>Registruotis</Label>
+                </Button>
+            {/if}
+        </div>
+    </div>
+
+    <p>/DEBUG AUTO-LOGIN/</p>
+    <div class="flex gap-4">
+        <div class="flex flex-col gap-2">
+            <Button
+                disabled={buttonsDisabled}
+                variant="outlined"
+                on:click={() => {
+                    userInfo.username = "user_1";
+                    userInfo.password = "pass1";
+
+                    authHandler("login");
+                }}
+            >
+                <Label underline>[user_1]</Label>
+            </Button>
+            <Button
+                disabled={buttonsDisabled}
+                variant="outlined"
+                on:click={() => {
+                    userInfo.username = "user_2";
+                    userInfo.password = "pass1";
+
+                    authHandler("login");
+                }}
+            >
+                <Label underline>[user_2]</Label>
+            </Button>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <Button
+                disabled={buttonsDisabled}
+                variant="outlined"
+                on:click={() => {
+                    userInfo.username = "renter_1";
+                    userInfo.password = "pass1";
+
+                    authHandler("login");
+                }}
+            >
+                <Label underline>[renter_1]</Label>
+            </Button>
+            <Button
+                disabled={buttonsDisabled}
+                variant="outlined"
+                on:click={() => {
+                    userInfo.username = "renter_2";
+                    userInfo.password = "pass1";
+
+                    authHandler("login");
+                }}
+            >
+                <Label underline>[renter_2]</Label>
+            </Button>
+        </div>
+
+        <Button
+            disabled={buttonsDisabled}
+            variant="outlined"
+            on:click={() => {
+                userInfo.username = "mod_1";
+                userInfo.password = "pass1";
+
+                authHandler("login");
+            }}
+        >
+            <Label underline>[mod_1]</Label>
+        </Button>
     </div>
 </div>

@@ -21,32 +21,32 @@
         <div class="grow flex gap-8 items-center">
             <a href="/" class=""><HomeIcon /></a>
             {#if userRole}
-            <Button variant="unelevated" href={`/${userRole}`}>
-                <Label>
-                    {#if userRole === "user"}
-                        Nuomuotis
-                    {:else if userRole === "mod"}
-                        Moderuoti
-                    {:else if userRole === "renter"}
-                        Nuomuojami produktai
-                    {/if}
-                </Label>
-            </Button>
-
-            {#if userRole === "renter"}
-                <Button variant="unelevated" href={`/renter/requests`}>
+                <Button variant="unelevated" href={`/${userRole}`}>
                     <Label>
-                        Užsakymai
+                        {#if userRole === "user"}
+                            Nuomuotis
+                        {:else if userRole === "mod"}
+                            Moderuoti
+                        {:else if userRole === "renter"}
+                            Nuomojami produktai
+                        {/if}
                     </Label>
                 </Button>
-            {/if}
 
-            {/if}
+                {#if userRole === "renter"}
+                    <Button variant="unelevated" href={`/renter/requests`}>
+                        <Label>Užsakymai</Label>
+                    </Button>
+                    <Button variant="unelevated" href={`/renter/analytics`}>
+                        <Label>Analitika</Label>
+                    </Button>
+                {/if}
 
-            {#if userRole && userRole === "user"}
-                <Button variant="unelevated" href="/reviews">
-                    <Label>Atsiliepimai</Label>
-                </Button>
+                {#if userRole === "user"}
+                    <Button variant="unelevated" href={`/user/returns`}>
+                        <Label>Gražinti</Label>
+                    </Button>
+                {/if}
             {/if}
         </div>
 

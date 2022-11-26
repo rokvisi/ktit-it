@@ -2,7 +2,7 @@
     import "../app.css";
     import Header from "$components/Header.svelte";
     import queryClient from "$lib/query";
-    import { QueryClientProvider } from '@sveltestack/svelte-query'
+    import { QueryClientProvider } from "@sveltestack/svelte-query";
 </script>
 
 <QueryClientProvider client={queryClient}>

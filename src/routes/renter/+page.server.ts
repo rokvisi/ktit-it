@@ -2,7 +2,6 @@ import promisePool from '$lib/db';
 import { trycatchasync } from '$utils/trycatch';
 import { error } from '@sveltejs/kit';
 import type { ServerLoad } from "@sveltejs/kit";
-import type { ItemDB } from '$types/DBStructures';
 import { getDBItemsForUser } from '$utils/db';
 
 export const load: ServerLoad = async ({ params, locals, parent, cookies }) => {

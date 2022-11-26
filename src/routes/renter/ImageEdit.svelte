@@ -51,7 +51,9 @@
         <div class="flex gap-8 border rounded p-4 items-center">
             <img class="w-40" src={image} alt="product" />
             <p class="grow">{image}</p>
-            <ActionButton onClick={() => onImageDelete(image)}>Naikinti</ActionButton>
+            <ActionButton onClick={() => onImageDelete(image)}
+                >Naikinti</ActionButton
+            >
         </div>
     {/each}
     <div class="space-y-4">

@@ -10,7 +10,6 @@ export const GET: RequestHandler = async () => {
         throw error(500, itemsQueryError);
     }
     let [items] = itemsQueryResult as unknown as [ItemDB[]];
-    // console.log(items);
 
     //* Fetch all images.
     const [imagesQueryResylt, imagesQueryError] = await trycatchasync(async () => await promisePool.execute(`SELECT * FROM \`images\``));
@@ -18,7 +17,6 @@ export const GET: RequestHandler = async () => {
         throw error(500, imagesQueryError);
     }
     let [images] = imagesQueryResylt as unknown as [ImageDB[]];
-    // console.log(images);
 
     //* Fetch all item groups.
     const [itemGroupQueryResylt, itemGroupitemGroupQueryError] = await trycatchasync(async () => await promisePool.execute(`SELECT * FROM \`item_groups\``));
@@ -26,7 +24,6 @@ export const GET: RequestHandler = async () => {
         throw error(500, itemGroupitemGroupQueryError);
     }
     let [itemGroups] = itemGroupQueryResylt as unknown as [ItemGroupDB[]];
-    // console.log(itemGroups);
 
     //* Push all items to the final array.
     const parsedItems = items.map((item) => ({

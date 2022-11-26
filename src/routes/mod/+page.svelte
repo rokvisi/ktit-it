@@ -28,7 +28,7 @@
             return { state: "error", text: "Ištrinti nepavyko!" };
         }
 
-        setTimeout(() => queryClient.invalidateQueries("imagesAPI"), 2000)
+        setTimeout(() => queryClient.invalidateQueries("imagesAPI"), 2000);
         return { state: "success", text: "Ištrinta!" };
     }
 
@@ -44,7 +44,7 @@
             return { state: "error", text: "Ištrinti nepavyko!" };
         }
 
-        setTimeout(() => queryClient.invalidateQueries("reviewsAPI"), 2000)
+        setTimeout(() => queryClient.invalidateQueries("reviewsAPI"), 2000);
         return { state: "success", text: "Ištrinta!" };
     }
 </script>
@@ -64,13 +64,19 @@
         {:else}
             <div class="grid grid-cols-5 gap-10">
                 {#each $dataStatusImages.data.images as image (image.url)}
-                    <div class="rounded space-y-4">
+                    <div class="rounded space-y-4 shadow-lg p-4">
+                        <p>{image.pk_user}</p>
+                        <p class="truncate">{image.name}</p>
                         <img
                             class="w-40 aspect-square mx-auto"
                             src={image.url}
                             alt="product"
                         />
-                        <ActionButton class="w-full" onClick={() => deleteImage(image.url)}>Naikinti</ActionButton>
+                        <ActionButton
+                            class="w-full"
+                            onClick={() => deleteImage(image.url)}
+                            >Naikinti</ActionButton
+                        >
                     </div>
                 {/each}
             </div>
@@ -84,10 +90,16 @@
             {#each $dataStatusReviews.data.reviews as review (review.review)}
                 <div class="flex rounded gap-4">
                     <div class="border rounded shadow grow p-2">
-                        <p class="text-gray-500">{review.fk_reviewer} -> {review.fk_renter}</p>
+                        <p class="text-gray-500">
+                            {review.fk_reviewer} -> {review.fk_renter}
+                        </p>
                         <p>{review.review}</p>
                     </div>
-                    <ActionButton class="" onClick={() => deleteReview(review.id)}>Naikinti</ActionButton>
+                    <ActionButton
+                        class=""
+                        onClick={() => deleteReview(review.id)}
+                        >Naikinti</ActionButton
+                    >
                 </div>
                 <hr />
             {/each}

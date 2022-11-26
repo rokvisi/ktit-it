@@ -6,9 +6,9 @@ import env from "$lib/dotenv";
 import { SESSION_COOKIE_OPTIONS } from "$lib/const";
 import { sha512 } from "$utils/db";
 
-export const POST: RequestHandler = async ({request}) => {
+export const POST: RequestHandler = async ({ request }) => {
     //* GET CREDENTIALS FROM REQUEST
-    const {username, password} = await request.json();
+    const { username, password } = await request.json();
 
     //* HASH PASSWORD
     const hashedPassword = await sha512(password);
@@ -23,7 +23,7 @@ export const POST: RequestHandler = async ({request}) => {
 
     //* STRIP PASSWORD FROM RESULT
     const userData = (user as [any])[0];
-    const strippedUserData = {...userData, password: undefined};
+    const strippedUserData = { ...userData, password: undefined };
 
     //* CREATE A SESSION COOKIE
     const session = jwt.sign({

@@ -1,7 +1,7 @@
 import promisePool from '$lib/db';
 import { trycatchasync } from '$utils/trycatch';
 import { error } from '@sveltejs/kit';
-import type { ImageDB, Item, ItemDB, ItemGroupDB, RentRequest } from '$types/DBStructures';
+import type { Item, RentRequest } from '$types/DBStructures';
 import _ from "underscore";
 
 export function toFixedPrecision(num: number, precision: number): number {
@@ -27,7 +27,7 @@ export async function getDBItemsForUser(user: string): Promise<Item[]> {
     const [items] = itemsQueryResult as unknown as [ItemsQueryResult[]];
 
     //* Get the images.
-    const [imageQueryResult, imageQueryError] = await trycatchasync(async () => await promisePool.execute(`SELECT img.url, i.name as itemName FROM images as img INNER JOIN items as i ON i.id LEFT JOIN items ON img.fk_item = i.id WHERE i.pk_user = ? GROUP BY img.url `, [user]));
+    const [imageQueryResult, imageQueryError] = await trycatchasync(async () => await promisePool.execute(`SELECT img.url, i.name as itemName FROM images as img INNER JOIN items as i ON i.id = img.fk_item WHERE i.pk_user = ? GROUP BY img.url`, [user]));
     if (imageQueryError) {
         throw error(500, imageQueryError);
     }
@@ -55,10 +55,10 @@ export async function getDBItemsForUser(user: string): Promise<Item[]> {
 }
 
 export async function getDBRentRequestsForUser(user: string): Promise<RentRequest[]> {
-    type RequestQueryResult = { status: string; fk_rentee: string; name: string; time: Date; url: string }
+    type RequestQueryResult = { id: number, status: string; fk_renter: string; fk_rentee: string; name: string; itemId: number; time: Date; url: string }
 
     //* Get the requests.
-    const [requestsQueryResult, requestsQueryError] = await trycatchasync(async () => await promisePool.execute(`SELECT r.status, r.fk_rentee, i.name, r.time, img.url FROM rent_requests AS r LEFT JOIN items AS i ON r.fk_item = i.id LEFT JOIN images as img ON i.id = img.fk_item WHERE r.fk_renter = ?`, [user]));
+    const [requestsQueryResult, requestsQueryError] = await trycatchasync(async () => await promisePool.execute(`SELECT r.id,  r.status, r.fk_renter, r.fk_rentee, i.name, i.id as itemId, r.time, img.url FROM rent_requests AS r LEFT JOIN items AS i ON r.fk_item = i.id LEFT JOIN ( SELECT * FROM images AS im GROUP BY im.fk_item ) AS img ON i.id = img.fk_item WHERE r.fk_renter = ?`, [user]));
     if (requestsQueryError) {
         throw error(500, requestsQueryError);
     }
@@ -66,9 +66,12 @@ export async function getDBRentRequestsForUser(user: string): Promise<RentReques
 
     return requests.map((request) => {
         return {
+            id: request.id,
             status: request.status,
+            renter: request.fk_renter,
             rentee: request.fk_rentee,
             itemName: request.name,
+            itemId: request.itemId,
             time: request.time,
             image_url: request.url,
         };

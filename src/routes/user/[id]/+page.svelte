@@ -3,7 +3,6 @@
     import PencilSquareIcon from "$components/svg-icons/PencilSquareIcon.svelte";
     import UserIcon from "$components/svg-icons/UserIcon.svelte";
     import type { Item } from "$types/DBStructures";
-    import Button, { Label } from "@smui/button";
     import Accordion, { Panel, Header, Content } from "@smui-extra/accordion";
     import IconButton, { Icon } from "@smui/icon-button";
     import { page } from "$app/stores";
@@ -11,11 +10,16 @@
     import queryClient from "$lib/query";
     import ActionButton from "$components/ActionButton.svelte";
     import type ActionButtonRes from "$types/ActionButtonRes";
+    import qs from "qs";
 
     export let data: Item;
 
     const dataStatus = useQuery("reviewData", () =>
-        fetch(`${$page.url.origin}/api/db/reviews`).then((res) => res.json())
+        fetch(
+            `${$page.url.origin}/api/db/reviews?${qs.stringify({
+                user: data.renter,
+            })}`
+        ).then((res) => res.json())
     );
 
     const primaryImage = data.images[0];
@@ -42,6 +46,35 @@
         queryClient.invalidateQueries("reviewData");
 
         return { state: "success", text: "Atsiliepimas išsiųstas" };
+    }
+
+    let rentBtnDisabled = false;
+    async function send_rent_request(): ActionButtonRes {
+        const res = await fetch("/api/db/requests", {
+            method: "POST",
+            body: JSON.stringify({
+                renter: data.renter,
+                rentee: $page.data.username,
+                itemId: data.id,
+            }),
+        });
+
+        if (!res.ok) {
+            const { message } = await res.json();
+
+            if (
+                message.startsWith("Daiktas") ||
+                message.startsWith("Užklausa")
+            ) {
+                return { state: "warn", text: message };
+            }
+
+            rentBtnDisabled = true;
+            return { state: "error", text: message };
+        }
+
+        rentBtnDisabled = true;
+        return { state: "success", text: "Užklausa išsiųsta!" };
     }
 </script>
 
@@ -92,9 +125,13 @@
                     {/each}
                 </div>
             </div>
-            <Button class="w-full" variant="raised">
-                <Label underline>Nuomuotis!</Label>
-            </Button>
+            <ActionButton
+                disabled={rentBtnDisabled}
+                class="w-full"
+                onClick={send_rent_request}
+            >
+                Nuomuotis!
+            </ActionButton>
         </div>
     </div>
     <div class="flex flex-col gap-4">

@@ -2,8 +2,6 @@ import promisePool from "$lib/db";
 import type { ReviewDB } from "$types/DBStructures";
 import { trycatchasync } from "$utils/trycatch";
 import { error, type RequestHandler } from "@sveltejs/kit";
-import qs from "qs";
-
 
 export const POST: RequestHandler = async ({ request }) => {
     const { user, renter, review } = await request.json();
@@ -14,7 +12,7 @@ export const POST: RequestHandler = async ({ request }) => {
         throw error(500, reviewAuthQueryError);
     }
     if ((reviewAuthQuery[0] as any).length === 0) {
-        throw error(401, "Prieš palikdami atsiliepimą, išbandykite nuomininką!");
+        throw error(401, "Prieš palikdami atsiliepimą, išsinuomokite kažką!");
     }
 
     //* Post the review.
@@ -27,7 +25,7 @@ export const POST: RequestHandler = async ({ request }) => {
     return new Response(undefined, { status: 200 });
 }
 
-export const GET: RequestHandler = async ({url}) => {
+export const GET: RequestHandler = async ({ url }) => {
     if (url.searchParams.get("user")) {
         //* Fetch all items.
         const [reviewQueryResult, reviewQueryError] = await trycatchasync(async () => await promisePool.execute(`SELECT * FROM reviews WHERE reviews.fk_renter = ?`, [url.searchParams.get("user")]));
@@ -36,11 +34,12 @@ export const GET: RequestHandler = async ({url}) => {
         }
         const [reviews] = reviewQueryResult as unknown as [ReviewDB[]];
 
+        //* Return the response.
         return new Response(JSON.stringify({ reviews }), { status: 200 });
     }
 
     //* Fetch all items.
-    const [reviewQueryResult, reviewQueryError] = await trycatchasync(async () => await promisePool.execute(`SELECT * FROM \`reviews\``));
+    const [reviewQueryResult, reviewQueryError] = await trycatchasync(async () => await promisePool.execute(`SELECT * FROM reviews`));
     if (reviewQueryError) {
         throw error(500, reviewQueryError);
     }

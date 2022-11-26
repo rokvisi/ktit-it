@@ -49,9 +49,12 @@ export type ReviewDB = {
 }
 
 export type RentRequest = {
+    id: number,
     status: string,
+    renter: string,
     rentee: string,
     itemName: string,
+    itemId: number,
     time: Date,
     image_url: string,
 }
